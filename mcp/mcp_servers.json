@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "apify": {
+      "command": "npx",
+      "args": ["-y", "@apify/actors-mcp-server"],
+      "env": {
+        "APIFY_TOKEN": "${APIFY_TOKEN}"
+      }
+    },
+    "composio": {
+      "command": "npx",
+      "args": ["-y", "@composio/mcp", "proxy"],
+      "env": {
+        "COMPOSIO_API_KEY": "${COMPOSIO_API_KEY}"
+      }
+    },
+    "whatsapp": {
+      "command": "npx",
+      "args": ["-y", "whatsapp-mcp"],
+      "env": {}
+    },
+    "browser": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "env": {}
+    }
+  }
+}
