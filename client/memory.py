@@ -3,6 +3,7 @@ import json
 import time
 import math
 import re
+from contextlib import closing
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 
@@ -14,7 +15,7 @@ class EpisodicMemory:
         self._init_db()
 
     def _init_db(self):
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn:
             conn.execute("""
             CREATE TABLE IF NOT EXISTS episodes (
                 id TEXT PRIMARY KEY,
@@ -61,7 +62,7 @@ class EpisodicMemory:
     def record_episode(self, episode_id: str, task_type: str, prompt: str, draft: str, 
                        critic_feedback: str, final_content: str, model: str, provider: str, 
                        score: float, success: bool):
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn:
             conn.execute("""
             INSERT OR REPLACE INTO episodes 
             (id, task_type, prompt, draft_content, critic_feedback, final_content, model_used, provider, critic_score, success)
@@ -71,7 +72,7 @@ class EpisodicMemory:
 
     def add_or_update_lesson(self, lesson_id: str, task_type: str, trigger_pattern: str, 
                              lesson_text: str, success: bool = True):
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT success_count, failure_count FROM lessons WHERE id = ?", (lesson_id,))
             row = cursor.fetchone()
@@ -83,14 +84,17 @@ class EpisodicMemory:
                 UPDATE lessons SET success_count = ?, failure_count = ?, confidence = ? WHERE id = ?
                 """, (s_count, f_count, confidence, lesson_id))
             else:
+                success_count = 1 if success else 0
+                failure_count = 0 if success else 1
+                confidence = success_count / float(success_count + failure_count)
                 cursor.execute("""
                 INSERT INTO lessons (id, task_type, trigger_pattern, lesson_text, confidence, success_count, failure_count)
-                VALUES (?, ?, ?, ?, 1.0, 1, 0)
-                """, (lesson_id, task_type, trigger_pattern, lesson_text))
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (lesson_id, task_type, trigger_pattern, lesson_text, confidence, success_count, failure_count))
             conn.commit()
 
     def retrieve_relevant_lessons(self, query: str, task_type: Optional[str] = None, top_k: int = 4) -> List[Dict[str, Any]]:
-        with sqlite3.connect(self.db_path) as conn:
+        with closing(sqlite3.connect(self.db_path)) as conn:
             cursor = conn.cursor()
             if task_type:
                 cursor.execute("SELECT id, task_type, trigger_pattern, lesson_text, confidence FROM lessons WHERE task_type = ?", (task_type,))

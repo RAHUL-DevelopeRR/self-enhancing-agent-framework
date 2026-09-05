@@ -1,6 +1,7 @@
 import sqlite3
 import uuid
 import logging
+from contextlib import closing
 from typing import List, Dict, Any
 from .memory import EpisodicMemory
 
@@ -15,7 +16,7 @@ class ExperienceHarvester:
 
     async def distill_lessons(self, min_episodes: int = 5):
         """Analyzes recent episodes with lower scores or repeated critiques to extract actionable rules."""
-        with sqlite3.connect(self.memory.db_path) as conn:
+        with closing(sqlite3.connect(self.memory.db_path)) as conn:
             cursor = conn.cursor()
             cursor.execute("""
             SELECT task_type, prompt, critic_feedback, final_content, critic_score 

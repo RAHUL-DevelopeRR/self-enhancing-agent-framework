@@ -1,5 +1,32 @@
 # Self-Enhancing Autonomous Agentic Framework
 
+## DLLM V0 prototype
+
+This repository now includes a runnable V0 of the **Decentralized/Distributed
+Specialist LLM Runtime**: a medium engineering-manager model delegates bounded
+work to independent Shell, FileOps, Code, Testing, Verification and Web/RAG
+workers served through llama.cpp. Typed tool boundaries, append-only `.cntx`
+project documentation, phase-gated model activation and the existing episodic
+self-enhancement loop are integrated.
+
+Start with [the V0 architecture](docs/DLLM_V0_ARCHITECTURE.md), then read the
+[boundary and ambiguity contract](docs/DLLM_BOUNDARIES.md) and the
+[model-selection decision](docs/MODEL_SELECTION.md).
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dllm.txt
+winget install llama.cpp
+./scripts/start_dllm_llama.ps1
+.\.venv\Scripts\python.exe -m dllm init
+.\.venv\Scripts\python.exe -m dllm doctor
+.\.venv\Scripts\python.exe -m dllm run "List files containing AgenticLoop"
+```
+
+Writes and shell execution are disabled unless explicitly enabled. The selected
+GGUF models are bootstrap candidates for V0; [specialist training](training/README.md)
+begins after traces establish measurable failure cases and accepted corrections.
+
 An independent, model-agnostic agentic framework designed to scrape lead datasets, conduct personalized omnichannel outreach (WhatsApp, Instagram, Zoho Mail), automatically generate responsive websites upon client agreement, and showcase client transformations on social media.
 
 Built upon a **two-tier decoupled architecture**:

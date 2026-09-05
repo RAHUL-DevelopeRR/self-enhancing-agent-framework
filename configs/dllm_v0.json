@@ -1,0 +1,108 @@
+{
+  "version": "0.1",
+  "workers": [
+    {
+      "id": "engineering-manager-v0",
+      "capability": "manager",
+      "model": "dllm-manager",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "max_tokens": 900,
+      "context_budget": 5000,
+      "temperature": 0.1,
+      "timeout_seconds": 180,
+      "system_prompt": "You are the engineering manager of a DLLM software organization. Understand the goal, decompose it into bounded work orders, delegate each step to one available specialist, define acceptance criteria and dependencies, and resolve cross-domain ambiguity. Do not perform specialist work yourself. Use only declared capabilities. If user intent is materially ambiguous, set user_clarification. Return only schema-valid JSON."
+    },
+    {
+      "id": "shell-worker-v0",
+      "capability": "shell",
+      "model": "dllm-shell",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "max_tokens": 280,
+      "context_budget": 1000,
+      "temperature": 0.0,
+      "system_prompt": "You are an independent Shell specialist. Translate a bounded work order into the smallest safe argv-based Bash or PowerShell operation. Prefer read-only inspection, never broaden paths or permissions, and explicitly report missing context or ambiguity. Produce typed tool calls but never claim execution. Return only schema-valid JSON."
+    },
+    {
+      "id": "fileops-worker-v0",
+      "capability": "fileops",
+      "model": "dllm-fileops",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "max_tokens": 320,
+      "context_budget": 1400,
+      "temperature": 0.0,
+      "system_prompt": "You are an independent FileOps specialist. Understand repository navigation, paths, text search, reads, hashes, collision rules and reversible writes. Produce only available typed filesystem calls, remain inside the project root, and report uncertain targets as ambiguity. Return only schema-valid JSON."
+    },
+    {
+      "id": "code-worker-v0",
+      "capability": "code",
+      "model": "dllm-code",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "max_tokens": 1200,
+      "context_budget": 5000,
+      "temperature": 0.1,
+      "timeout_seconds": 120,
+      "system_prompt": "You are an independent code specialist. Implement only the bounded change, obey project decisions from .cntx, and provide explicit file actions, assumptions and evidence. Do not expand the task or claim unobserved test success. Return only schema-valid JSON."
+    },
+    {
+      "id": "test-worker-v0",
+      "capability": "test",
+      "model": "dllm-test",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "max_tokens": 480,
+      "context_budget": 2400,
+      "temperature": 0.0,
+      "system_prompt": "You are an independent testing and diagnostics specialist. Select the smallest relevant argv-based test command, interpret exact evidence, and never declare success without real results. Return missing context and ambiguity explicitly. Return only schema-valid JSON."
+    },
+    {
+      "id": "verification-worker-v0",
+      "capability": "verify",
+      "model": "dllm-verifier",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "max_tokens": 360,
+      "context_budget": 2200,
+      "temperature": 0.0,
+      "system_prompt": "You are an independent verifier. Compare the work order and acceptance criteria against real tool observations. Complete only when evidence satisfies the criteria; otherwise return concise feedback or missing information. Do not execute tools. Return only schema-valid JSON."
+    },
+    {
+      "id": "web-research-worker-v0",
+      "capability": "web_research",
+      "model": "dllm-fileops",
+      "base_url": "http://127.0.0.1:8080/v1",
+      "max_tokens": 500,
+      "context_budget": 3000,
+      "temperature": 0.0,
+      "system_prompt": "You are an independent web research specialist. Use only supplied retrieved evidence, preserve URLs and dates, prefer primary sources, and clearly distinguish evidence from inference. Return only schema-valid JSON."
+    }
+  ],
+  "routing": {
+    "fast_path": true,
+    "confidence_threshold": 0.72,
+    "max_worker_retries": 1,
+    "max_manager_replans": 1,
+    "max_parallel_steps": 3,
+    "verify_all_mutations": true
+  },
+  "tools": {
+    "project_root_only": true,
+    "allow_shell": false,
+    "allow_writes": false,
+    "command_timeout_seconds": 30,
+    "max_output_chars": 12000
+  },
+  "context": {
+    "path": ".dllm/project.cntx",
+    "max_events_per_package": 12,
+    "semantic_compaction": true,
+    "lexical_retrieval": true,
+    "vector_backend": "none",
+    "turboquant_bits": 4
+  },
+  "web_rag": {
+    "enabled": false,
+    "searxng_url": null,
+    "result_limit": 3,
+    "fetch_timeout_seconds": 10,
+    "max_document_chars": 12000,
+    "allowed_domains": []
+  }
+}

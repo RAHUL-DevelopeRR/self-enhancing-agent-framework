@@ -40,6 +40,8 @@ ENV/
 *.sqlite3
 generated_sites/
 .cache/
+.dllm/
+training/derived/
 
 # IDE files
 .vscode/
